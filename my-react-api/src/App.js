@@ -1,16 +1,27 @@
 //import React from 'react';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import TodoList from './components/TodoList';
 import TodoForm from './components/TodoForm';
 import './App.css';
 
 function App() {
-      const [todos, setTodos] = useState([
-        { complete: false, task: "Aprendendo sobre MongoDb"},
-        { complete: false, task: "Criando um React para fazer App"},
-        { complete: false, task: "Encontra minha chave"}
-      ]);
-      return (
+  const [todos, setTodos] = useState([]);
+  
+  useEffect(() => {
+    const fetchTasks = async () => {
+      let response = await fetch('http://localhost:5000/todo/getall'
+      );
+      if (response.ok) { //get the task lists
+        let json = await response.json();
+        setTodos(json);
+      } else {
+        alert("HTTP-Error: " + response.status);
+      }
+    }
+    fetchTasks();
+  }, [])
+
+  return (
         <div className="App">
           <TodoForm addTodo={(todo) => {
             if (todo.task.trim().length > 0) {
@@ -20,6 +31,7 @@ function App() {
           <TodoList todos={todos} updateTodos={(list) => { setTodos(list) }}></TodoList>
         </div>
   );
+  
 }
 
 export default App;
